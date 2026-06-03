@@ -84,7 +84,7 @@ def run_demo():
         "Modi is doing great work"
     ]
     
-    print("\n📊 Results:\n")
+    print("\n Results:\n")
     for tweet in test_tweets:
         result = predict_sentiment(tweet, model, vectorizer)
         print(f"Tweet: {tweet}")
