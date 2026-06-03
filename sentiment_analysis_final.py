@@ -1,5 +1,5 @@
 """
-Twitter Sentiment Analysis Project
+Sentiment Analysis Project
 Hex Softwares Internship
 
 Accuracy: 84.94%
@@ -8,7 +8,7 @@ Classes: Negative (-1), Neutral (0), Positive (1)
 
 import re
 import joblib
-import pandas as pd
+import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
@@ -37,19 +37,60 @@ def clean_text_with_negations(text):
     
     return text
 
+# Load models (automatically looks for files in same folder)
+def load_models():
+    """Load the trained model and vectorizer"""
+    model_path = 'sentiment_model_final.pkl'
+    vectorizer_path = 'vectorizer_final.pkl'
+    
+    if os.path.exists(model_path) and os.path.exists(vectorizer_path):
+        model = joblib.load(model_path)
+        vectorizer = joblib.load(vectorizer_path)
+        print(" Models loaded successfully!")
+        return model, vectorizer
+    else:
+        print(" Model files not found. Make sure both .pkl files are in the same folder.")
+        return None, None
+
 # Prediction function
-def predict_sentiment(tweet, model, vectorizer):
+def predict_sentiment(tweet, model=None, vectorizer=None):
+    """Predict sentiment of a tweet"""
+    if model is None or vectorizer is None:
+        model, vectorizer = load_models()
+        if model is None:
+            return "Error: Models not loaded"
+    
     cleaned = clean_text_with_negations(tweet)
     features = vectorizer.transform([cleaned])
     pred = model.predict(features)[0]
     return {1: "Positive", 0: "Neutral", -1: "Negative"}[pred]
 
-# Load your saved model (update paths)
-# model = joblib.load('sentiment_model_final.pkl')
-# vectorizer = joblib.load('vectorizer_final.pkl')
+# Demo function
+def run_demo():
+    """Run a quick demo of the model"""
+    print("\n" + "="*50)
+    print("TWITTER SENTIMENT ANALYSIS DEMO")
+    print("="*50)
+    
+    model, vectorizer = load_models()
+    if model is None:
+        return
+    
+    test_tweets = [
+        "I love this!",
+        "This is terrible",
+        "Not bad at all",
+        "I have no opinion",
+        "Modi is doing great work"
+    ]
+    
+    print("\n📊 Results:\n")
+    for tweet in test_tweets:
+        result = predict_sentiment(tweet, model, vectorizer)
+        print(f"Tweet: {tweet}")
+        print(f"Sentiment: {result}\n")
 
-# Example usage
-# print(predict_sentiment("I love this!", model, vectorizer))
-
-print("Sentiment Analysis Model Ready!")
-print("Accuracy: 84.94%")
+if __name__ == "__main__":
+    print("Sentiment Analysis Model Ready!")
+    print("Accuracy: 84.94%")
+    run_demo()
