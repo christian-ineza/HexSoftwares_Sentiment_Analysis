@@ -46,10 +46,10 @@ def load_models():
     if os.path.exists(model_path) and os.path.exists(vectorizer_path):
         model = joblib.load(model_path)
         vectorizer = joblib.load(vectorizer_path)
-        print(" Models loaded successfully!")
+        print("[OK] Models loaded successfully!")
         return model, vectorizer
     else:
-        print(" Model files not found. Make sure both .pkl files are in the same folder.")
+        print("[ERROR] Model files not found. Make sure both .pkl files are in the same folder.")
         return None, None
 
 # Prediction function
@@ -65,11 +65,57 @@ def predict_sentiment(tweet, model=None, vectorizer=None):
     pred = model.predict(features)[0]
     return {1: "Positive", 0: "Neutral", -1: "Negative"}[pred]
 
+# Interactive typing feature
+def interactive_mode():
+    """Let user type tweets and get predictions in real-time"""
+    print("\n" + "="*50)
+    print("   TYPE A TWEET AND GET SENTIMENT")
+    print("="*50)
+    
+    model, vectorizer = load_models()
+    if model is None:
+        return
+    
+    print("\nType any tweet and press Enter")
+    print("Type 'exit' or 'quit' to stop")
+    print("Type 'demo' to see example tweets")
+    print("="*50)
+    
+    while True:
+        print("\nYour tweet:", end=" ")
+        user_input = input()
+        
+        if user_input.lower() in ['exit', 'quit']:
+            print("\n" + "="*50)
+            print("   THANK YOU FOR USING")
+            print("   Hex Softwares")
+            print("="*50)
+            break
+        
+        elif user_input.lower() == 'demo':
+            print("\nRunning demo tweets...\n")
+            demo_tweets = [
+                "I love this!",
+                "This is terrible",
+                "Not bad at all",
+                "I have no opinion"
+            ]
+            for tweet in demo_tweets:
+                result = predict_sentiment(tweet, model, vectorizer)
+                print(f"   Tweet: {tweet}")
+                print(f"   Sentiment: {result}\n")
+        
+        elif user_input.strip():
+            result = predict_sentiment(user_input, model, vectorizer)
+            print(f"\n   Tweet: {user_input}")
+            print(f"   Sentiment: {result}")
+            print("-"*40)
+
 # Demo function
 def run_demo():
     """Run a quick demo of the model"""
     print("\n" + "="*50)
-    print("TWITTER SENTIMENT ANALYSIS DEMO")
+    print("   SENTIMENT ANALYSIS DEMO")
     print("="*50)
     
     model, vectorizer = load_models()
@@ -84,13 +130,33 @@ def run_demo():
         "Modi is doing great work"
     ]
     
-    print("\n Results:\n")
+    print("\nResults:\n")
     for tweet in test_tweets:
         result = predict_sentiment(tweet, model, vectorizer)
-        print(f"Tweet: {tweet}")
-        print(f"Sentiment: {result}\n")
+        print(f"   Tweet: {tweet}")
+        print(f"   Sentiment: {result}\n")
 
 if __name__ == "__main__":
-    print("Sentiment Analysis Model Ready!")
-    print("Accuracy: 84.94%")
-    run_demo()
+    print("="*50)
+    print("   SENTIMENT ANALYSIS MODEL")
+    print("   Hex Softwares Internship")
+    print("="*50)
+    print(f"   Accuracy: 84.94%")
+    print(f"   Model: Logistic Regression")
+    print(f"   Ready for predictions")
+    print("="*50)
+    
+    # Ask user what they want to do
+    print("\nChoose an option:")
+    print("   1. Type tweets interactively")
+    print("   2. Run demo")
+    print("   3. Exit")
+    
+    choice = input("\nEnter 1, 2, or 3: ")
+    
+    if choice == '1':
+        interactive_mode()
+    elif choice == '2':
+        run_demo()
+    else:
+        print("\nGoodbye!")
